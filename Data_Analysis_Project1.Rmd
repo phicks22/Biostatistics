@@ -1,0 +1,108 @@
+---
+title: "Data_Analysis_Project1"
+author: "Parker Hicks"
+date: "3/27/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+library(dplyr)
+library("car")
+NCA <- Bugando_NCA
+```
+
+###Graph
+```{r}
+ggplot(NCA, aes(x = Sex, y = HC)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(text = element_text(size=20)) +
+  ggtitle("Head Circumference of Males and Females from the Ngorongoro Conservation Area") + 
+  xlab("Sex (Female/Male)") +
+  ylab("Head Circumference (cm)")
+```
+
+### Hypothesis
+Null: The head circumferences of males and females from the Ngorongoro Conservation Area are not statistically different.
+
+Alternative: The head circumferences of males and females from the Ngorongoro Conservation Area are statistically different.
+
+### Summary Statistics
+## Mean
+```{r}
+mean_HC <- mean(NCA$HC)
+cat("The mean head circumference among males and females was", mean_HC, "cm.")
+```
+
+```{r}
+#Group means were taken from the t-test below
+mean_HC_males <- 31.96943
+mean_HC_females <- 31.94454
+cat("The mean head circumference of males was", mean_HC_males, "cm.")
+cat(" The mean head circumference of females was", mean_HC_females, "cm.")
+```
+
+##Confidence Intervals
+```{r}
+male_data <- subset(Bugando_NCA, Sex=="M", select=HC)
+female_data <- subset(Bugando_NCA, Sex=="F", select=HC)
+
+male_confint <- t.test(male_data)$conf.int
+female_confint <- t.test(female_data)$conf.int
+
+male_confint
+female_confint
+
+NCA_confint <- t.test(NCA$HC)$conf.int
+NCA_confint
+```
+
+## Standard error
+```{r}
+ser <- function(x){
+  st_dev <- sd(x)
+  n <- length(x)
+  st_er <- st_dev / sqrt(n)
+  
+  return(st_er)
+}
+
+st_er_males <- ser(male_data$HC)
+st_er_females <- ser(female_data$HC)
+st_er_overall <- ser(NCA$HC)
+
+st_er_males
+st_er_females
+st_er_overall
+```
+
+### Statistical Tests
+## Equal variance test
+```{r}
+var.test(HC ~ Sex, data=NCA, alternative="two.sided")
+```
+The variances of the data are not statistically different from one another (F=1.28, p>0.05, two-sided F-test).
+
+## Shapiro-Wilk test for normallity
+```{r}
+shapiro.test(NCA$HC)
+```
+The data are not significantly different than a normal distribution (W=0.988, p>0.05, Shapiro-Wilk test).
+
+## Two-sided t-test
+```{r}
+t.test(data=NCA, HC ~ Sex, alternative="two.sided", var.equal=FALSE)
+```
+The head circumferences of males and females from the Ngorongoro Conservation Area are not statistically different from one another (t[113.67]=-0.084, p>0.05, two-sided t-test).
+
+
+
+
+
+
+
+
+
