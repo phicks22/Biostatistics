@@ -1,0 +1,114 @@
+---
+title: "Lab_ANOVA"
+author: "Parker Hicks"
+date: "4/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+library(binom)
+library(dplyr)
+library(FSA)
+library(car)
+library(rcompanion)
+library(multcomp)
+```
+
+## Data
+```{r}
+stress_echo_data <- read.csv(("Desktop/W11_Lab_stressEcho_DATA.csv"), stringsAsFactors = TRUE)
+hr_smoke_data <- subset(stress_echo_data, select=c("bhr", "hxofCig"))
+hr_smoke_omit <- na.omit(hr_smoke_data)
+```
+
+## Graph
+```{r}
+ggplot(hr_smoke_omit, aes(x=hxofCig, y=bhr)) +
+  geom_violin() +
+  stat_summary(fun=mean, geom="point", size=3, color="blue") +
+  stat_summary(fun.data = mean_se, geom="errorbar", width=0.33, color="blue") +
+  theme_minimal()
+```
+
+## Descriptive Statistics
+```{r}
+Summarize(bhr ~ hxofCig, hr_smoke_omit)
+```
+
+## Test Statistics
+H0: There is no significant difference of base heart rate between individuals who are heavy or moderate smokers or non-smokers.
+
+Ha: There is at least one significant difference of base heart rate between individuals who are heavy or moderate smokers or non-smokers.
+
+### One-way ANOVA
+```{r}
+bhr_lm <- lm(bhr ~ hxofCig, hr_smoke_omit)
+anova(bhr_lm)
+```
+
+## Assumption tests
+```{r}
+qqnorm(bhr_lm$residuals)
+qqline(bhr_lm$residuals)
+
+# Shapiro-Wilk test of residuals
+shapiro.test(bhr_lm$residuals)
+```
+
+## Levene's Test
+```{r}
+leveneTest(bhr ~ hxofCig, hr_smoke_omit)
+```
+
+```{r}
+plot(bhr_lm)
+```
+
+## Inferential Statistics
+### Confidence Intervals
+```{r}
+confint(bhr_lm)
+```
+
+### Standard Error
+```{r}
+sem <- function(x){
+  st_dev <- sd(x)
+  st_er <- (sqrt(st_dev)) / length(x)
+}
+
+summarize(hr_smoke_omit, Standard_Error = sem(bhr))
+```
+
+## R-Squared
+```{r}
+summary(bhr_lm)$r.squared
+```
+
+## INTERPRETATION
+
+There was no significant relationship between the basal heart rates of heavy, moderate, and non-smokers (ANOVA, F(2,555)= 2.5322; p=0.0804). The extent of smoking only explained 0.09% of the basal heart rates of the subjects (R=0.00904). Post hoc comparisons were not performed because the ANOVA test resulted in a non-significant p-value. The data did not meet the assumption of normality most likely due to extreme outliers, but they did meet the assumption of equal variance. Alternative tests were not performed because a majority of the data aligned with the qqline (Figure 1) except for a some outliers and the data met homogeneity of variance. The mean(± SE) of the basal heart rates of heavy, moderate, and non-smokers were 77.803(± 0.0359), 73.565(± 0.0263), and 75.060(± 0.0127) respectively (Figure 2). We failed to reject the null hypothesis, but further tests should be performed to identify any differences in other randomly sampled groups. 
+
+### Figure 1
+```{r}
+qqnorm(bhr_lm$residuals)
+qqline(bhr_lm$residuals)
+```
+QQ plot of the linear model from basal heart rate as a function of the extent of smoking.
+
+### Figure 2
+```{r}
+ggplot(hr_smoke_omit, aes(x=hxofCig, y=bhr)) +
+  geom_violin() +
+  stat_summary(fun=mean, geom="point", size=3, color="blue") +
+  stat_summary(fun.data = mean_se, geom="errorbar", width=0.33, color="blue") +
+  theme_minimal() +
+  ggtitle("Basal Heart Rate as a Function of Smoking Habits") +
+  xlab("Extent of Smoking") +
+  ylab("Basal Heart Rate (bpm)")
+```
+A violin plot displaying the basal heart rates (bpm) as a function of the subjects' smoking habits.
+
