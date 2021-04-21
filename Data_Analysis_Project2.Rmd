@@ -16,6 +16,7 @@ if(!require(dplyr)) install.packages("dplyr")
 if(!require(binom)) install.packages("binom")
 if(!require(rcompanion)) install.packages("rcompanion")
 if(!require(multcomp)) install.packages("multcomp")
+if(!require(aod)) install.packages("aod")
 
 library(readr)
 library(ggplot2)
@@ -26,13 +27,15 @@ library(car)
 library(rcompanion)
 library(multcomp)
 library(ggpubr)
+library(aod)
 ```
 
 # Data
 ```{r}
 tit_data <- read.csv(("/Users/parkerhicks/Desktop/Biostats_data/tit_fitness_data.csv"), stringsAsFactors = TRUE)
 
-tit_dataOmit <- na.omit(tit_data)
+tit_dataOmit <- na.omit(subset(tit_data, select=c("Weight", "wing", "broodSizeWhenSampled")))
+tit_dataOmit$broodSizeWhenSampled <- tit_dataOmit$broodSizeWhenSampled / 10
 ```
 
 # Hypothesis
@@ -47,7 +50,33 @@ There is a difference in the brood size of wild great tits on the basis of weigh
 There is a difference in the brood size of wild great tits on the basis of wing size.
 There is a difference in the brood size of wild great tits on the basis of weight and wing size
 
-#Graph
+# Assumption Tests
+```{r}
+tit_glm <- glm(broodSizeWhenSampled ~ Weight + wing, family="binomial", data = tit_dataOmit)
+tit_glm
+```
+
+
+#Graphs
+
+## Brood size ~ weight
+```{r}
+ggscatter(tit_dataOmit, x="Weight", y="wing", add = "reg.line", 
+          conf.int = TRUE, cor.coef = TRUE, cor.method = "spearman")
+```
+
+## Brood size ~ wing size
+```{r}
+
+```
+
+## Brood size ~ weight * wing size
+```{r}
+ggplot(tit_dataOmit,aes(y=wing,x=Weight,color=factor(broodSizeWhenSampled)))+geom_point()+stat_smooth(method="lm",se=FALSE)+
+  theme_minimal()
+```
+
+
 
 
 
