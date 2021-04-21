@@ -7,24 +7,50 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+if(!require(car)) install.packages("car")
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(ggpubr)) install.packages("ggpubr")
+if(!require(FSA)) install.packages("FSA")
+if(!require(dplyr)) install.packages("dplyr")
+if(!require(binom)) install.packages("binom")
+if(!require(rcompanion)) install.packages("rcompanion")
+if(!require(multcomp)) install.packages("multcomp")
+
+library(readr)
+library(ggplot2)
+library(binom)
+library(dplyr)
+library(FSA)
+library(car)
+library(rcompanion)
+library(multcomp)
+library(ggpubr)
 ```
 
-## R Markdown
+# Data
+```{r}
+tit_data <- read.csv(("/Users/parkerhicks/Desktop/Biostats_data/tit_fitness_data.csv"), stringsAsFactors = TRUE)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+tit_dataOmit <- na.omit(tit_data)
 ```
 
-## Including Plots
+# Hypothesis
 
-You can also embed plots, for example:
+Null: 
+There is no difference in the brood size of wild great tits on the basis of weight.
+There is no difference in the brood size of wild great tits on the basis of wing size.
+There is no difference in the brood size of wild great tits on the basis of weight and wing size
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+Alternative:
+There is a difference in the brood size of wild great tits on the basis of weight.
+There is a difference in the brood size of wild great tits on the basis of wing size.
+There is a difference in the brood size of wild great tits on the basis of weight and wing size
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#Graph
+
+
+
+
+
+
