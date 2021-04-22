@@ -52,12 +52,17 @@ There is a difference in the brood size of wild great tits on the basis of weigh
 
 # Assumption Tests
 ```{r}
-tit_glm <- glm(broodSizeWhenSampled ~ Weight + wing, family="binomial", data = tit_dataOmit)
-tit_glm
+tit_glm <- glm(broodSizeWhenSampled ~ Weight*wing, family="poisson", data = tit_dataOmit)
+summary(tit_glm)
 ```
 
 
 #Graphs
+```{r}
+plot(tit_glm)
+```
+
+
 
 ## Brood size ~ weight
 ```{r}
