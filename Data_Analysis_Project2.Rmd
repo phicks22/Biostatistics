@@ -17,6 +17,7 @@ if(!require(binom)) install.packages("binom")
 if(!require(rcompanion)) install.packages("rcompanion")
 if(!require(multcomp)) install.packages("multcomp")
 if(!require(aod)) install.packages("aod")
+if(!require(sandwich)) install.packages("sandwich")
 
 library(readr)
 library(ggplot2)
@@ -28,6 +29,7 @@ library(rcompanion)
 library(multcomp)
 library(ggpubr)
 library(aod)
+library(sandwich)
 ```
 
 # Data
@@ -54,6 +56,18 @@ There is a difference in the brood size of wild great tits on the basis of weigh
 ```{r}
 tit_glm <- glm(broodSizeWhenSampled ~ Weight*wing, family="poisson", data = tit_dataOmit)
 summary(tit_glm)
+```
+
+### Confidence Intervals
+```{r}
+cov.tit_glm <- vcovHC(tit_glm, type="HC0")
+std.err <- sqrt(diag(cov.tit_glm))
+r.est <- cbind(Estimate= coef(tit_glm), "SE" = std.err,
+"Pr(>|z|)" = 2 * pnorm(abs(coef(tit_glm)/std.err), lower.tail=FALSE),
+Lower_CI = coef(tit_glm) - 1.96 * std.err,
+Upper_CI = coef(tit_glm) + 1.96 * std.err)
+
+r.est
 ```
 
 
