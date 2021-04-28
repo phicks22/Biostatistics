@@ -119,6 +119,8 @@ predictbrood = predict(model, tit_dataOmit)
 table(tit_dataOmit$broodSizeWhenSampled, predictbrood)
 mean(as.character(tit_dataOmit$broodSizeWhenSampled) != as.character(predictbrood))
 ```
+The linear model identifies low and high brood sizes poorly. This is because of inadequate representation of low and high brood sizes in the data. Shown in the histogram above.
+
 
 ## Brood size ~ weight * wing size
 ```{r}
