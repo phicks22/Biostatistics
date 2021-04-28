@@ -18,6 +18,7 @@ if(!require(rcompanion)) install.packages("rcompanion")
 if(!require(multcomp)) install.packages("multcomp")
 if(!require(aod)) install.packages("aod")
 if(!require(sandwich)) install.packages("sandwich")
+if(!require(coin)){install.packages("coin")}
 
 library(readr)
 library(ggplot2)
@@ -30,6 +31,7 @@ library(multcomp)
 library(ggpubr)
 library(aod)
 library(sandwich)
+library(coin)
 ```
 
 # Data
@@ -37,7 +39,7 @@ library(sandwich)
 tit_data <- read.csv(("/Users/parkerhicks/Desktop/Biostats_data/tit_fitness_data.csv"), stringsAsFactors = TRUE)
 
 tit_dataOmit <- na.omit(subset(tit_data, select=c("Weight", "wing", "broodSizeWhenSampled")))
-tit_dataOmit$broodSizeWhenSampled <- tit_dataOmit$broodSizeWhenSampled / 10
+#tit_dataOmit$broodSizeWhenSampled <- tit_dataOmit$broodSizeWhenSampled / 10
 ```
 
 # Hypothesis
@@ -52,7 +54,7 @@ There is a difference in the brood size of wild great tits on the basis of weigh
 There is a difference in the brood size of wild great tits on the basis of wing size.
 There is a difference in the brood size of wild great tits on the basis of weight and wing size
 
-# Assumption Tests
+# Linear Model
 ```{r}
 tit_glm <- glm(broodSizeWhenSampled ~ Weight*wing, family="poisson", data = tit_dataOmit)
 summary(tit_glm)
@@ -71,11 +73,20 @@ r.est
 ```
 
 
-#Graphs
+#Assumption Tests
 ```{r}
 plot(tit_glm)
 ```
 
+## Graph
+```{r}
+ggplot(tit_dataOmit, aes(x= broodSizeWhenSampled)) +
+  geom_histogram(binwidth = 1) +
+  theme_minimal() +
+  xlab("Great Tit Brood Size When Sampled") +
+  ylab("Count") +
+  ggtitle("Distribution of Brood Sizes Among Great Tits ")
+```
 
 
 ## Brood size ~ weight
@@ -84,9 +95,10 @@ ggscatter(tit_dataOmit, x="Weight", y="wing", add = "reg.line",
           conf.int = TRUE, cor.coef = TRUE, cor.method = "spearman")
 ```
 
-## Brood size ~ wing size
+## Permutation Independence Test
 ```{r}
-
+independence_test(broodSizeWhenSampled ~ Weight*wing,
+                  data = tit_dataOmit)
 ```
 
 ## Brood size ~ weight * wing size
