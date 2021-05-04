@@ -121,8 +121,32 @@ The ordinal logistic model identifies low and high brood sizes poorly. This is b
 library("effects")
 Effect(focal.predictors = "Weight",log_model)
 plot(Effect(focal.predictors = "Weight",log_model), ticks=list(at=c(0.5)))
+
+Effect(focal.predictors = "wing",log_model)
+plot(Effect(focal.predictors = "wing",log_model), ticks=list(at=c(0.5)))
+
+Effect(focal.predictors = "Weight",log_model)
+plot(Effect(focal.predictors = c("Weight", "wing"),log_model), ticks=list(at=c(0.5)))
 ```
 
+```{r}
+tit_data_test <- read.csv(("/Users/parkerhicks/Desktop/Biostats_data/tit_fitness_data_cat.csv"), stringsAsFactors = TRUE)
+
+tit_data_test$broodSizeWhenSampled <- factor(tit_data_test$broodSizeWhenSampled, levels = c(1, 2, 3, 4, 5, 6))
+
+log_model_test <- polr(broodSizeWhenSampled ~ Weight*wing , data = tit_data_test, Hess = TRUE)
+summary(log_model_test)
+
+Effect(focal.predictors = "Weight",log_model_test)
+plot(Effect(focal.predictors = "Weight",log_model_test), ticks=list(at=c(0.5)))
+
+Effect(focal.predictors = "wing",log_model)
+plot(Effect(focal.predictors = "wing",log_model_test), ticks=list(at=c(0.5)))
+
+```
+Small: 10 - 40
+Medium: 41 - 70
+Large: 71 - 85
 
 ## Assumption Tests
 ```{r}
