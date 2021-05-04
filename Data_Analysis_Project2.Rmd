@@ -60,13 +60,13 @@ There is a difference in the brood size of wild great tits on the basis of weigh
 There is a difference in the brood size of wild great tits on the basis of wing size.
 There is a difference in the brood size of wild great tits on the basis of weight and wing size
 
-# Linear Model
+# Generalized Linear Model
 ```{r}
 tit_glm <- glm(broodSizeWhenSampled ~ Weight*wing, family="poisson", data = tit_dataOmit)
 summary(tit_glm)
 ```
 
-### Confidence Intervals
+## Confidence Intervals (glm)
 ```{r}
 cov.tit_glm <- vcovHC(tit_glm, type="HC0")
 std.err <- sqrt(diag(cov.tit_glm))
@@ -79,12 +79,12 @@ r.est
 ```
 
 
-#Assumption Tests
+##Assumption Tests (glm)
 ```{r}
 plot(tit_glm)
 ```
 
-## Graph
+# Graph (distribution)
 ```{r}
 ggplot(tit_dataOmit, aes(x= broodSizeWhenSampled)) +
   geom_histogram(binwidth = 1) +
@@ -94,7 +94,15 @@ ggplot(tit_dataOmit, aes(x= broodSizeWhenSampled)) +
   ggtitle("Distribution of Brood Sizes Among Great Tits ")
 ```
 
-## Permutation Independence Test
+# Summary Statistics
+```{r}
+mean_wing <- mean(tit_dataOmit$wing)
+mean_weight <- mean(tit_dataOmit$Weight)
+mean_brood <- mean(tit_dataOmit$broodSizeWhenSampled)
+```
+
+
+# Permutation Independence Test
 ```{r}
 independence_test(broodSizeWhenSampled ~ Weight*wing,
                   data = tit_dataOmit)
