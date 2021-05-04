@@ -22,6 +22,8 @@ if(!require(aod)) install.packages("aod")
 if(!require(sandwich)) install.packages("sandwich")
 if(!require(coin)){install.packages("coin")}
 if(!require(agricolae)){install.packages("agricolae")}
+if(!require(effects)){install.packages("effects")}
+
 
 library(readr)
 library(ggplot2)
@@ -92,13 +94,6 @@ ggplot(tit_dataOmit, aes(x= broodSizeWhenSampled)) +
   ggtitle("Distribution of Brood Sizes Among Great Tits ")
 ```
 
-
-## Brood size ~ weight
-```{r}
-ggscatter(tit_dataOmit, x="Weight", y="wing", add = "reg.line", 
-          conf.int = TRUE, cor.coef = TRUE, cor.method = "spearman")
-```
-
 ## Permutation Independence Test
 ```{r}
 independence_test(broodSizeWhenSampled ~ Weight*wing,
@@ -109,25 +104,38 @@ independence_test(broodSizeWhenSampled ~ Weight*wing,
 ```{r}
 tit_dataOmit$broodSizeWhenSampled <- factor(tit_dataOmit$broodSizeWhenSampled, levels = c(1, 2, 3, 4, 5, 6))
 
-model <- polr(broodSizeWhenSampled ~ Weight*wing , data = tit_dataOmit, Hess = TRUE)
-summary(model)
+log_model <- polr(broodSizeWhenSampled ~ Weight*wing , data = tit_dataOmit, Hess = TRUE)
+summary(log_model)
 ```
+
 
 ## Confusion Matrix
 ```{r}
-predictbrood = predict(model, tit_dataOmit)
+predictbrood = predict(log_model, tit_dataOmit)
 table(tit_dataOmit$broodSizeWhenSampled, predictbrood)
 mean(as.character(tit_dataOmit$broodSizeWhenSampled) != as.character(predictbrood))
 ```
-The linear model identifies low and high brood sizes poorly. This is because of inadequate representation of low and high brood sizes in the data. Shown in the histogram above.
+The ordinal logistic model identifies low and high brood sizes poorly. This is because of inadequate representation of low and high brood sizes in the data. Shown in the histogram above.
 
-
-## Brood size ~ weight * wing size
 ```{r}
-ggplot(tit_dataOmit,aes(y=wing,x=Weight,color=factor(broodSizeWhenSampled)))+geom_point()+stat_smooth(method="lm",se=FALSE)+
-  theme_minimal()
+library("effects")
+Effect(focal.predictors = "Weight",log_model)
+plot(Effect(focal.predictors = "Weight",log_model), ticks=list(at=c(0.5)))
 ```
 
+
+## Assumption Tests
+```{r}
+qqnorm(tit_dataOmit$wing)
+qqline(tit_dataOmit$wing)
+
+qqnorm(tit_dataOmit$Weight)
+qqline(tit_dataOmit$Weight)
+
+shapiro.test(tit_dataOmit$wing)
+shapiro.test(tit_dataOmit$Weight)
+```
+The numerical data do not fit a normal distribution as the great tit wing and weights failed the Shapiro-Wilk test and are visibly different on the Q-Q plots. 
 
 
 
