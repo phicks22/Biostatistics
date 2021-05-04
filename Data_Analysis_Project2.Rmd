@@ -45,7 +45,6 @@ library(agricolae)
 tit_data <- read.csv(("/Users/parkerhicks/Desktop/Biostats_data/tit_fitness_data.csv"), stringsAsFactors = TRUE)
 
 tit_dataOmit <- na.omit(subset(tit_data, select=c("Weight", "wing", "broodSizeWhenSampled")))
-#tit_dataOmit$broodSizeWhenSampled <- tit_dataOmit$broodSizeWhenSampled / 10
 ```
 
 # Hypothesis
@@ -84,7 +83,8 @@ r.est
 plot(tit_glm)
 ```
 
-# Graph (distribution)
+# Graphs
+## Brood Size Distribution
 ```{r}
 ggplot(tit_dataOmit, aes(x= broodSizeWhenSampled)) +
   geom_histogram(binwidth = 1) +
@@ -94,11 +94,48 @@ ggplot(tit_dataOmit, aes(x= broodSizeWhenSampled)) +
   ggtitle("Distribution of Brood Sizes Among Great Tits ")
 ```
 
+## Wing and Weight
+```{r}
+ggplot(tit_dataOmit, aes(x=wing, y=Weight)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle("Collected Wing and Weight Measurements") +
+  xlab("Wing Size (mm)") +
+  ylab("Weight (g)")
+```
+
+
+
 # Summary Statistics
+## Distribution
+```{r}
+summary(tit_dataOmit)
+```
+
+## Data means
 ```{r}
 mean_wing <- mean(tit_dataOmit$wing)
 mean_weight <- mean(tit_dataOmit$Weight)
-mean_brood <- mean(tit_dataOmit$broodSizeWhenSampled)
+
+mean_wing
+mean_weight
+```
+
+## Standard Error
+```{r}
+ser <- function(x){
+  st_dev <- sd(x)
+  n <- length(x)
+  st_er <- st_dev / sqrt(n)
+  
+  return(st_er)
+}
+
+st_er_wing <- ser(tit_dataOmit$wing)
+st_er_weight <- ser(tit_dataOmit$Weight)
+
+st_er_weight
+st_er_wing
 ```
 
 
@@ -128,13 +165,10 @@ The ordinal logistic model identifies low and high brood sizes poorly. This is b
 ```{r}
 library("effects")
 Effect(focal.predictors = "Weight",log_model)
-plot(Effect(focal.predictors = "Weight",log_model), ticks=list(at=c(0.5)))
+plot(Effect(focal.predictors = "Weight",log_model), ticks=list(at=c(0.5)), main = "Prob of Brood Size by Weight (g)")
 
 Effect(focal.predictors = "wing",log_model)
-plot(Effect(focal.predictors = "wing",log_model), ticks=list(at=c(0.5)))
-
-Effect(focal.predictors = "Weight",log_model)
-plot(Effect(focal.predictors = c("Weight", "wing"),log_model), ticks=list(at=c(0.5)))
+plot(Effect(focal.predictors = "wing",log_model), ticks=list(at=c(0.5)), main = "Prob of Brood Size by Wing size (mm)")
 ```
 
 ```{r}
@@ -146,10 +180,10 @@ log_model_test <- polr(broodSizeWhenSampled ~ Weight*wing , data = tit_data_test
 summary(log_model_test)
 
 Effect(focal.predictors = "Weight",log_model_test)
-plot(Effect(focal.predictors = "Weight",log_model_test), ticks=list(at=c(0.5)))
+plot(Effect(focal.predictors = "Weight",log_model_test), ticks=list(at=c(0.5)), main = "Prob of Brood Size by Weight (g)")
 
 Effect(focal.predictors = "wing",log_model)
-plot(Effect(focal.predictors = "wing",log_model_test), ticks=list(at=c(0.5)))
+plot(Effect(focal.predictors = "wing",log_model_test), ticks=list(at=c(0.5)), main = "Prob of Brood Size by Wing size")
 
 ```
 Small: 10 - 40
@@ -166,6 +200,7 @@ qqline(tit_dataOmit$Weight)
 
 shapiro.test(tit_dataOmit$wing)
 shapiro.test(tit_dataOmit$Weight)
+
 ```
 The numerical data do not fit a normal distribution as the great tit wing and weights failed the Shapiro-Wilk test and are visibly different on the Q-Q plots. 
 
