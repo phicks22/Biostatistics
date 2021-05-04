@@ -99,12 +99,10 @@ ggplot(tit_dataOmit, aes(x= broodSizeWhenSampled)) +
 ggplot(tit_dataOmit, aes(x=wing, y=Weight)) +
   geom_point() +
   theme_minimal() +
-  ggtitle("Collected Wing and Weight Measurements") +
+  ggtitle("Wing and Weight Measurements of Great Tits") +
   xlab("Wing Size (mm)") +
   ylab("Weight (g)")
 ```
-
-
 
 # Summary Statistics
 ## Distribution
@@ -138,14 +136,13 @@ st_er_weight
 st_er_wing
 ```
 
-
 # Permutation Independence Test
 ```{r}
 independence_test(broodSizeWhenSampled ~ Weight*wing,
                   data = tit_dataOmit)
 ```
 
-## Post hoc
+# Post hoc
 ```{r}
 tit_dataOmit$broodSizeWhenSampled <- factor(tit_dataOmit$broodSizeWhenSampled, levels = c(1, 2, 3, 4, 5, 6))
 
@@ -162,6 +159,8 @@ mean(as.character(tit_dataOmit$broodSizeWhenSampled) != as.character(predictbroo
 ```
 The ordinal logistic model identifies low and high brood sizes poorly. This is because of inadequate representation of low and high brood sizes in the data. Shown in the histogram above.
 
+## Post hoc Graphs
+### Probability of Brood Size (Wing as continuous variable)
 ```{r}
 library("effects")
 Effect(focal.predictors = "Weight",log_model)
@@ -171,6 +170,7 @@ Effect(focal.predictors = "wing",log_model)
 plot(Effect(focal.predictors = "wing",log_model), ticks=list(at=c(0.5)), main = "Prob of Brood Size by Wing size (mm)")
 ```
 
+### Probability of Brood Size (Wing as categorical variable)
 ```{r}
 tit_data_test <- read.csv(("/Users/parkerhicks/Desktop/Biostats_data/tit_fitness_data_cat.csv"), stringsAsFactors = TRUE)
 
