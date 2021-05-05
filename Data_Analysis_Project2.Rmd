@@ -91,7 +91,8 @@ ggplot(tit_dataOmit, aes(x= broodSizeWhenSampled)) +
   theme_minimal() +
   xlab("Great Tit Brood Size When Sampled") +
   ylab("Count") +
-  ggtitle("Distribution of Brood Sizes Among Great Tits ")
+  ggtitle("Distribution of Brood Sizes Among Great Tits") +
+  theme(plot.title = element_text(size = 20))
 ```
 
 ## Wing and Weight
@@ -100,6 +101,7 @@ ggplot(tit_dataOmit, aes(x=wing, y=Weight)) +
   geom_point() +
   theme_minimal() +
   ggtitle("Wing and Weight Measurements of Great Tits") +
+  theme(text = element_text(size=15)) +
   xlab("Wing Size (mm)") +
   ylab("Weight (g)")
 ```
@@ -142,7 +144,7 @@ independence_test(broodSizeWhenSampled ~ Weight*wing,
                   data = tit_dataOmit)
 ```
 
-# Post hoc
+# Post hoc (Ordinal Logistic Regression)
 ```{r}
 tit_dataOmit$broodSizeWhenSampled <- factor(tit_dataOmit$broodSizeWhenSampled, levels = c(1, 2, 3, 4, 5, 6))
 
